@@ -42,7 +42,7 @@ public class StoneMovement : MonoBehaviour
 
         velocity.x = Mathf.Sign(velocity.x) * horizontalSpeed;
         transform.position += velocity * Time.deltaTime;
-        
+
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -60,5 +60,16 @@ public class StoneMovement : MonoBehaviour
                 velocity.x *= -1;
             }
         }
+    }
+
+    public void AddVerticalVelicity(float velicity)
+    {
+        this.velocity.y += velicity;
+    }
+
+    public void SetHorizontalDirection(float direction)
+    {
+
+        velocity.x = Mathf.Sign(direction) * horizontalSpeed;
     }
 }

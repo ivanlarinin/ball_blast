@@ -4,21 +4,26 @@ using UnityEngine.Events;
 
 public class Destructable : MonoBehaviour
 {
-    [SerializeField] private int maxHitPoints;
+    public int maxHitPoints;
     private int hitPoints;
 
-    public UnityEvent Die;
-    public UnityEvent ChangeHitPoints;
+    [HideInInspector] public UnityEvent Die;
+    [HideInInspector] public UnityEvent ChangeHitPoints;
+
+    private bool isDie = false;
 
     public void Start()
     {
         hitPoints = maxHitPoints;
+        ChangeHitPoints.Invoke();
     }
+
     public void ApplyDamage(int damage)
     {
+        hitPoints -= damage;
+
         ChangeHitPoints.Invoke();
 
-        hitPoints -= damage;
         if (hitPoints <= 0)
         {
             Kill();
@@ -27,18 +32,15 @@ public class Destructable : MonoBehaviour
 
     public void Kill()
     {
+        if (isDie == true) return;
         hitPoints = 0;
-        Die.Invoke();
+        isDie = true;
         ChangeHitPoints.Invoke();
+        Die.Invoke();
     }
 
     public int GetHitPoints()
     {
         return hitPoints;
-    }
-
-    public int GetMaxHitPoints()
-    {
-        return maxHitPoints;
     }
 }

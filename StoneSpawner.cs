@@ -14,12 +14,16 @@ public class StoneSpawner : MonoBehaviour
     [SerializeField][Range(0.0f, 1.0f)] private float minHitpointsPercentage;
     [SerializeField] private float maxHitpointsRate;
 
+    [Header("Stone Colors")]
+    [SerializeField] private Color[] stoneColors;
+
     [Space(10)] public UnityEvent Completed;
 
     private float timer;
     private float amountSpawned;
     private int stoneMaxHitpoints;
     private int stoneMinHitpoints;
+    private int[] initialSizeCounts = new int[4]; // Huge, Big, Normal, Small
 
     private void Start()
     {
@@ -50,9 +54,21 @@ public class StoneSpawner : MonoBehaviour
 
     private void Spawn()
     {
+        Stone.Size size = (Stone.Size)Random.Range(1, 4); // 1=Normal, 2=Big, 3=Huge
         Stone stone = Instantiate(stonePrefab, spawnPoints[Random.Range(0, spawnPoints.Length)].position, Quaternion.identity);
-        stone.SetSize((Stone.Size)Random.Range(1, 4));
+        stone.SetSize(size);
         stone.maxHitPoints = Random.Range(stoneMinHitpoints, stoneMaxHitpoints + 1);
+        initialSizeCounts[(int)size]++;
+
+        if (stoneColors.Length > 0)
+        {
+            Color randomColor = stoneColors[Random.Range(0, stoneColors.Length)];
+            stone.SetStoneColor(randomColor);
+        }
+
         amountSpawned++;
     }
+
+    public int GetAmount() { return amount; }
+    public int[] GetInitialSizeCounts() { return initialSizeCounts; }
 }
