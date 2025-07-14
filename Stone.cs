@@ -20,6 +20,9 @@ public class Stone : Destructable
     [SerializeField] private GameObject coinPrefab;
     [SerializeField][Range(0f, 1f)] private float coinSpawnChance = 0.5f;
 
+    [SerializeField] private GameObject bonusPrefab;
+    [SerializeField][Range(0f, 1f)] private float bonusSpawnChance = 0.1f;
+
 
     private StoneMovement movement;
 
@@ -47,7 +50,7 @@ public class Stone : Destructable
 
     private void OnStoneDestroyed()
     {
-        LevelState levelState = FindObjectOfType<LevelState>();
+        LevelState levelState = FindFirstObjectByType<LevelState>();
         if (levelState != null)
         {
             levelState.AddDestroyedStone(size);
@@ -57,6 +60,7 @@ public class Stone : Destructable
             SpawnStones();
         }
         TrySpawnCoin();
+        TrySpawnBonus();
         Destroy(gameObject);
     }
 
@@ -65,6 +69,20 @@ public class Stone : Destructable
         if (coinPrefab != null && Random.value <= coinSpawnChance)
         {
             Instantiate(coinPrefab, transform.position, Quaternion.identity);
+        }
+    }
+
+    private void TrySpawnBonus()
+    {
+        if (bonusPrefab != null && Random.value <= bonusSpawnChance)
+        {
+            var obj = Instantiate(bonusPrefab, transform.position, Quaternion.identity);
+            Bonus bonus = obj.GetComponent<Bonus>();
+            if (bonus != null)
+            {
+                BonusType type = (Random.value < 0.5f) ? BonusType.Freeze : BonusType.Invincibility;
+                bonus.SetBonusType(type);
+            }
         }
     }
 

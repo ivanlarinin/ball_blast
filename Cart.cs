@@ -16,6 +16,7 @@ public class Cart : MonoBehaviour
     private Vector3 movementTarget;
     private float deltaMovement;
     private float lastPositionX;
+    private bool isInvincible = false;
 
     private void Start()
     {
@@ -34,6 +35,7 @@ public class Cart : MonoBehaviour
         Stone stone = collision.transform.root.GetComponent<Stone>();
         if (stone != null)
         {
+            if (isInvincible) return;
             CollisionStone.Invoke();
         }
     }
@@ -58,6 +60,11 @@ public class Cart : MonoBehaviour
     public void SetMovementTarget(Vector3 target)
     {
         this.movementTarget = ClampMovementTarget(target);
+    }
+
+    public void SetInvincible(bool invincible)
+    {
+        isInvincible = invincible;
     }
 
     private Vector3 ClampMovementTarget(Vector3 target)

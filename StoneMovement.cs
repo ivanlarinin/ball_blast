@@ -13,13 +13,16 @@ public class StoneMovement : MonoBehaviour
     [SerializeField] private float rotationSpeed;
     [SerializeField] private float gravityOffset;
 
+    private bool isFrozen = false;
+
     private void Awake()
     {
-        velocity.x = -Mathf.Sign(transform.position.x) * horizontalSpeed;
+        velocity.x = -Mathf.Sign(transform.position.x) * horizontalSpeed * 0.8f;
     }
 
     private void Update()
     {
+        if (isFrozen) return;
         TryEnableGrabity();
         Move();
     }
@@ -40,7 +43,7 @@ public class StoneMovement : MonoBehaviour
             transform.Rotate(0, 0, rotationSpeed * Time.deltaTime);
         }
 
-        velocity.x = Mathf.Sign(velocity.x) * horizontalSpeed;
+        velocity.x = Mathf.Sign(velocity.x) * horizontalSpeed * 0.8f;
         transform.position += velocity * Time.deltaTime;
 
     }
@@ -70,6 +73,11 @@ public class StoneMovement : MonoBehaviour
     public void SetHorizontalDirection(float direction)
     {
 
-        velocity.x = Mathf.Sign(direction) * horizontalSpeed;
+        velocity.x = Mathf.Sign(direction) * horizontalSpeed * 0.8f;
+    }
+
+    public void SetFrozen(bool frozen)
+    {
+        isFrozen = frozen;
     }
 }

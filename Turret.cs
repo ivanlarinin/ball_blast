@@ -2,18 +2,33 @@ using UnityEngine;
 
 public class Turret : MonoBehaviour
 {
-    [SerializeField] private Projectile projectilePrefab;
-    [SerializeField] private Transform shootPoint;
-    [SerializeField] private float fireRate;
-    [SerializeField] private int damage;
-    [SerializeField] private int projectileAmount;
+    [Header("Base Stats")]
+    [SerializeField] private float baseFireRate = 1f;
+    [SerializeField] private int baseDamage = 10;
+    [SerializeField] private int baseProjectileAmount = 1;
     [SerializeField] private float projectileInterval;
 
-    private float timer;
+    [Header("References")]
+    [SerializeField] private Projectile projectilePrefab;
+    [SerializeField] private Transform shootPoint;
 
-    public int Damage => damage;
-    public int ProjectileAmount => projectileAmount;
-    public float FireRate => fireRate;
+    private float timer;
+    private UpgradeManager upgradeManager;
+
+    // Current stats with upgrades applied
+    public float FireRate => baseFireRate * (1f - (upgradeManager.FireRateLevel * 0.1f)); // 10% faster per level
+    public int Damage => baseDamage + (upgradeManager.DamageLevel * 5); // +5 damage per level
+    public int ProjectileAmount => baseProjectileAmount + upgradeManager.ProjectileAmountLevel; // +1 projectile per level
+
+    private void Awake()
+    {
+        upgradeManager = FindFirstObjectByType<UpgradeManager>();
+        if (upgradeManager == null)
+        {
+            Debug.LogWarning("UpgradeManager not found. Creating one.");
+            upgradeManager = new GameObject("UpgradeManager").AddComponent<UpgradeManager>();
+        }
+    }
 
     void Update()
     {
@@ -22,18 +37,18 @@ public class Turret : MonoBehaviour
 
     private void SpawnProjectile()
     {
-        float startPosX = shootPoint.position.x - projectileInterval * (projectileAmount - 1) * 0.5f;
+        float startPosX = shootPoint.position.x - projectileInterval * (ProjectileAmount - 1) * 0.5f;
 
-        for (int i = 0; i < projectileAmount; i++)
+        for (int i = 0; i < ProjectileAmount; i++)
         {
             Projectile projectile = Instantiate(projectilePrefab, new Vector3(startPosX + i * projectileInterval, shootPoint.position.y, shootPoint.position.z), transform.rotation);
-            projectile.SetDamage(damage);
+            projectile.SetDamage(Damage);
         }
     }
 
     public void Fire()
     {
-        if (timer >= fireRate)
+        if (timer >= FireRate)
         {
             SpawnProjectile();
             timer = 0;

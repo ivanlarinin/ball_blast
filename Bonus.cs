@@ -1,9 +1,15 @@
 using UnityEngine;
 
-public class Coin : MonoBehaviour
+public enum BonusType
+{
+    Freeze,
+    Invincibility
+}
+
+public class Bonus : MonoBehaviour
 {
     [SerializeField] private float lifeTime = 10f;
-    [SerializeField] private int value = 1;
+    [SerializeField] private BonusType bonusType;
 
     private Rigidbody2D rb;
     private bool landed = false;
@@ -14,15 +20,31 @@ public class Coin : MonoBehaviour
         Destroy(gameObject, lifeTime);
     }
 
+    public void SetBonusType(BonusType type)
+    {
+        bonusType = type;
+    }
+
+    public BonusType GetBonusType()
+    {
+        return bonusType;
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Cart cart = collision.transform.root.GetComponent<Cart>();
         if (cart != null)
         {
-            CoinManager coinManager = FindFirstObjectByType<CoinManager>();
-            if (coinManager != null)
+            if (BonusManager.Instance != null)
             {
-                coinManager.AddCoins(value);
+                if (bonusType == BonusType.Freeze)
+                {
+                    BonusManager.Instance.TriggerFreeze();
+                }
+                else if (bonusType == BonusType.Invincibility)
+                {
+                    BonusManager.Instance.TriggerInvincibility(cart);
+                }
             }
             Destroy(gameObject);
             return;
@@ -42,4 +64,4 @@ public class Coin : MonoBehaviour
             }
         }
     }
-}
+} 
